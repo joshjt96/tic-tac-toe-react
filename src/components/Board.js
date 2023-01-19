@@ -4,25 +4,27 @@ import Square from "./Square";
 import { useState } from "react";
 
 export default function Board() {
-  // Initialising state for the squares on the board as an Array with a length of 9 values that are set to be 'null':
   const [squares, setSquares] = useState(Array(9).fill(null));
-  // Initialising another state to mark X and O on the board in order:
   const [xIsNext, setXIsNext] = useState(true);
 
   function handleClick(i) {
-    // using slice method to copy the squares array, keeping the original state array immutable:
     const nextSquares = squares.slice();
-    // if statement that checks if a square is already filled and stops it from being changed:
     if (squares[i]) {
       return;
     }
-    // Ternary statement that determines if X or O will fill the empty square that is clicked:
     xIsNext ? (nextSquares[i] = "X") : (nextSquares[i] = "O");
-    // setSquare function is called with the copied array defined above:
     setSquares(nextSquares);
-    // setXIsNext function is called to flip the status of the boolean:
     setXIsNext(!xIsNext);
   }
+
+  // Steps of Board function:
+  // Initialising state for the squares on the board as an Array with a length of 9 values that are set to be 'null'
+  // Initialising another state to mark X and O on the board in order
+  // using slice method to copy the squares array, keeping the original state array immutable
+  // if statement that checks if a square is already filled and stops it from being changed
+  // Ternary operator that determines if X or O will fill the empty square that is clicked
+  // setSquare function is called with the copied array defined above
+  // setXIsNext function is called to flip the status of the boolean
 
   return (
     <>
