@@ -1,24 +1,38 @@
-import React, { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import Square from "./Square";
 import { useState } from "react";
 
-export default function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
+function Square({ value, onSquareClick }) {
+  return (
+    <button className="square" onClick={onSquareClick}>
+      {value}
+    </button>
+  );
+}
 
+function Board({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
-    const nextSquares = squares.slice();
-    if (squares[i]) {
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    xIsNext ? (nextSquares[i] = "X") : (nextSquares[i] = "O");
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = "X";
+    } else {
+      nextSquares[i] = "O";
+    }
+    onPlay(nextSquares);
+  }
+
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
   return (
     <>
+      <div className="status">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -36,7 +50,29 @@ export default function Board() {
       </div>
     </>
   );
-};
+}
+
+export default function Game() {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const currentSquares = history[history.length - 1];
+
+  function handlePlay(nextSquares) {
+    setHistory([...history, nextSquares]);
+    setXIsNext(!xIsNext);
+  }
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div className="game-info">
+        <ol>{/*TODO*/}</ol>
+      </div>
+    </div>
+  );
+}
 
 function calculateWinner(squares) {
   const lines = [
@@ -56,13 +92,14 @@ function calculateWinner(squares) {
     }
   }
   return null;
-};
+}
+
 
 // Steps of Board function:
   // Initialising state for the squares on the board as an Array with a length of 9 values that are set to be 'null'
   // Initialising another state to mark X and O on the board in order
-  // using slice method to copy the squares array, keeping the original state array immutable
   // if statement that checks if a square is already filled and stops it from being changed
+  // using slice method to copy the squares array, keeping the original state array immutable
   // Ternary operator that determines if X or O will fill the empty square that is clicked
   // setSquare function is called with the copied array defined above
   // setXIsNext function is called to flip the status of the boolean
